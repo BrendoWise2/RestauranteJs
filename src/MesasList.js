@@ -1,66 +1,60 @@
-import React, { useEffect, useState } from "react";
-import { Panel } from "primereact/panel";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import { Button } from "primereact/button";
-import { ProgressSpinner } from "primereact/progressspinner";
-import MesasForm from "./MesasForm";
+import React, { useState, useEffect } from "react";
 
-
-function MesasList() {
-
+function MesasList({ restauranteId }) {
     const [mesas, setMesas] = useState([]);
-    const [loading, setLoading] = useState(true);
-    
-    const [error, setError] = useState(null);
-    const [isAdding, setIsAdding] = useState(false);
+    const [novaMesa, setNovaMesa] = useState({ numero: "", capacidade: "" });
 
-    const listarMesas = async () => {
-        try {
-            const mesasResponse = await fetch('http://localhost:8080/mesa')
-            if (!mesasResponse.ok) {
-                throw new Error('Falha na requisição');
-            }
-
-            const dataMesas = await mesasResponse.json();
-            setMesas(dataMesas);
-        } catch (error) {
-            setError(error.message);
-        } finally {
-            setLoading(false);
-        }
-    }
-
+    // Buscar mesas do restaurante
     useEffect(() => {
-        listarMesas();
-    }, []);
+        fetch(`/mesa?restauranteId=${restauranteId}`)
+            .then((response) => response.json())
+            .then((data) => setMesas(data))
+            .catch((error) => console.error("Erro ao buscar mesas:", error));
+    }, [restauranteId]);
 
-    const salvarAtualizar = async () => {
-        await listarMesas();
-        setIsAdding(false);
-    }
+    // Adicionar mesa
+    const adicionarMesa = () => {
+        fetch("/mesa", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ...novaMesa, restauranteId }),
+        })
+            .then((response) => response.json())
+            .then((mesa) => {
+                setMesas([...mesas, mesa]);
+                setNovaMesa({ numero: "", capacidade: "" }); // Limpar o formulário
+            })
+            .catch((error) => console.error("Erro ao adicionar mesa:", error));
+    };
+
     return (
         <div>
-            <Panel header={isAdding ? "Cadastro de Mesa" : "Mesas Cadastrados"}>
-                <div style={{ marginBottom: '20px', textAlign: 'left' }}>
-                    <Button label={isAdding ? "Ver Lista de Mesas" : "Cadastrar Nova Mesa"}
-                        icon={isAdding ? "pi pi-arrow-left" : "pi pi-plus"}
-                        onClick={() => setIsAdding(!isAdding)} />
-                </div>
-                {loading && <ProgressSpinner />}
-                {isAdding ? (<MesasForm atualizarLista={salvarAtualizar}/>) :
-                    (
-                        <>
-                            {!loading && !error && (<DataTable value={mesas} paginator rows={5}
-                                rowsPerPageOptions={[5, 10, 25, 50]} tableStyle={{ minWidth: '50rem' }}>
-                                <Column field="Numero" header="Numero" style={{ width: '25%' }}></Column>
-                            </DataTable>)}
-                        </>
-                    )}
-            </Panel>
+            <h3>Mesas</h3>
+            <ul>
+                {mesas.map((mesa) => (
+                    <li key={mesa.id}>
+                        Mesa {mesa.numero} - Capacidade: {mesa.capacidade}
+                    </li>
+                ))}
+            </ul>
+            <h4>Adicionar Mesa</h4>
+            <div>
+                <input
+                    type="text"
+                    placeholder="Número"
+                    value={novaMesa.numero}
+                    onChange={(e) => setNovaMesa({ ...novaMesa, numero: e.target.value })}
+                />
+                <input
+                    type="number"
+                    placeholder="Capacidade"
+                    value={novaMesa.capacidade}
+                    onChange={(e) => setNovaMesa({ ...novaMesa, capacidade: e.target.value })}
+                />
+                <button onClick={adicionarMesa}>Adicionar</button>
+            </div>
         </div>
     );
 }
-
 
 export default MesasList;

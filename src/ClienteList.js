@@ -1,69 +1,60 @@
-import React, { useEffect, useState } from "react";
-import { Panel } from "primereact/panel";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import { Button } from "primereact/button";
-import { ProgressSpinner } from "primereact/progressspinner";
-import ClienteForm from "./ClienteForm";
+import React, { useState, useEffect } from "react";
 
-
-function ClienteList() {
-
+function ClienteList({ restauranteId }) {
     const [clientes, setClientes] = useState([]);
-    const [loading, setLoading] = useState(true);
-    
-    const [error, setError] = useState(null);
-    const [isAdding, setIsAdding] = useState(false);
+    const [novoCliente, setNovoCliente] = useState({ nome: "", email: "" });
 
-    const listarCliente = async () => {
-        try {
-            const clientesResponse = await fetch('http://localhost:8080/cliente')
-            if (!clientesResponse.ok) {
-                throw new Error('Falha na requisição');
-            }
-
-            const dataClientes = await clientesResponse.json();
-            setClientes(dataClientes);
-        } catch (error) {
-            setError(error.message);
-        } finally {
-            setLoading(false);
-        }
-    }
-
+    // Buscar clientes do restaurante
     useEffect(() => {
-        listarCliente();
-    }, []);
+        fetch(`/cliente?restauranteId=${restauranteId}`)
+            .then((response) => response.json())
+            .then((data) => setClientes(data))
+            .catch((error) => console.error("Erro ao buscar clientes:", error));
+    }, [restauranteId]);
 
-    const salvarAtualizar = async () => {
-        await listarCliente();
-        setIsAdding(false);
-    }
+    // Adicionar cliente
+    const adicionarCliente = () => {
+        fetch("/cliente", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ...novoCliente, restauranteId }),
+        })
+            .then((response) => response.json())
+            .then((cliente) => {
+                setClientes([...clientes, cliente]);
+                setNovoCliente({ nome: "", email: "" }); // Limpar o formulário
+            })
+            .catch((error) => console.error("Erro ao adicionar cliente:", error));
+    };
+
     return (
         <div>
-            <Panel header={isAdding ? "Cadastro de Cliente" : "Clientes Cadastrados"}>
-                <div style={{ marginBottom: '20px', textAlign: 'left' }}>
-                    <Button label={isAdding ? "Ver Lista de Clientes" : "Cadastrar Novo Cliente"}
-                        icon={isAdding ? "pi pi-arrow-left" : "pi pi-plus"}
-                        onClick={() => setIsAdding(!isAdding)} />
-                </div>
-                {loading && <ProgressSpinner />}
-                {isAdding ? (<ClienteForm atualizarLista={salvarAtualizar}/>) :
-                    (
-                        <>
-                            {!loading && !error && (<DataTable value={clientes} paginator rows={5}
-                                rowsPerPageOptions={[5, 10, 25, 50]} tableStyle={{ minWidth: '50rem' }}>
-                                <Column field="nome" header="Nome" style={{ width: '25%' }}></Column>
-                                <Column field="cpf" header="CPF" style={{ width: '25%' }}></Column>
-                                <Column field="telefone" header="Telefone" style={{ width: '25%' }}></Column>
-                                <Column field="email" header="E-mail" style={{ width: '25%' }}></Column>
-                            </DataTable>)}
-                        </>
-                    )}
-            </Panel>
+            <h3>Clientes</h3>
+            <ul>
+                {clientes.map((cliente) => (
+                    <li key={cliente.id}>
+                        {cliente.nome} - {cliente.email}
+                    </li>
+                ))}
+            </ul>
+            <h4>Adicionar Cliente</h4>
+            <div>
+                <input
+                    type="text"
+                    placeholder="Nome"
+                    value={novoCliente.nome}
+                    onChange={(e) => setNovoCliente({ ...novoCliente, nome: e.target.value })}
+                />
+                <input
+                    type="email"
+                    placeholder="Email"
+                    value={novoCliente.email}
+                    onChange={(e) => setNovoCliente({ ...novoCliente, email: e.target.value })}
+                />
+                <button onClick={adicionarCliente}>Adicionar</button>
+            </div>
         </div>
     );
 }
-
 
 export default ClienteList;
