@@ -1,6 +1,6 @@
 import React from "react";
 
-function RestauranteView({ cliente }) {
+function ClienteView({ cliente }) {
     if (!cliente) {
         return <p>Nenhum cliente selecionado.</p>;
     }

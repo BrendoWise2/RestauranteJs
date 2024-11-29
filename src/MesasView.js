@@ -1,6 +1,6 @@
 import React from "react";
 
-function RestauranteView({ mesas }) {
+function MesasView({ mesas }) {
     if (!mesas) {
         return <p>Nenhuma mesa selecionado.</p>;
     }
