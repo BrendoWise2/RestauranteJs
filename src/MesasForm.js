@@ -53,7 +53,7 @@ function MesasForm({ atualizarLista }) {
                         Num
                     </label>
                     <InputText id="num" value={num}
-                        onChange={(e) => setNome(e.target.value)}
+                        onChange={(e) => setNum(e.target.value)}
                         placeholder="Digite o número da mesa"
                         required className="p-inputtext-lg" />
                     {fieldErrors.num && <Message severity="error" text={fieldErrors.num}
