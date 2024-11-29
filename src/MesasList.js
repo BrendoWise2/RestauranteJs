@@ -23,7 +23,7 @@ function MesasList() {
             }
 
             const dataMesas = await mesasResponse.json();
-            setClientes(dataMesas);
+            setMesas(dataMesas);
         } catch (error) {
             setError(error.message);
         } finally {
