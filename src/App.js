@@ -7,7 +7,11 @@ function App() {
   return (
     <div className="App">
       <RestauranteList />
+<<<<<<< Updated upstream
+      
+=======
       <ClienteView/>
+>>>>>>> Stashed changes
     </div>
   );
 }
