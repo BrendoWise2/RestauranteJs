@@ -1,92 +1,81 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from 'react';
 
-function ClienteForm({ restaurante }) {
-    const [nome, setNome] = useState("");
-    const [cpf, setCpf] = useState("");
-    const [telefone, setTelefone] = useState("");
-    const [email, setEmail] = useState("");
+const ClienteForm = () => {
+  const [clientes, setClientes] = useState([]);
+  const [novoCliente, setNovoCliente] = useState({
+    nome: '',
+    cpf: '',
+    telefone: '',
+    email: '',
+    restaurante: { id: 1 } // Exemplo de restaurante com ID 1
+  });
 
-    const [message, setMessage] = useState("");
+  useEffect(() => {
+    // Carregar lista de clientes do backend
+    fetch("/api/cliente")
+      .then(response => response.json())
+      .then(data => setClientes(data))
+      .catch(error => console.error('Erro ao carregar clientes:', error));
+  }, []);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+  const handleAddCliente = () => {
+    // Enviar novo cliente para o backend
+    fetch("/api/cliente", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(novoCliente)
+    })
+      .then(response => response.json())
+      .then(data => {
+        // Atualizar o estado com o cliente recém-criado
+        setClientes([...clientes, data]);
+        // Limpar o formulário após salvar
+        setNovoCliente({ nome: '', cpf: '', telefone: '', email: '', restaurante: { id: 1 } });
+      })
+      .catch(error => console.error('Erro ao adicionar cliente:', error));
+  };
 
-        const cliente = {
-            nome,
-            cpf,
-            telefone,
-            email,
-            restaurante: { id: restaurante.id },
-        };
+  return (
+    <div>
+      <h2>Adicionar Cliente</h2>
+      <form>
+        <input
+          type="text"
+          placeholder="Nome"
+          value={novoCliente.nome}
+          onChange={(e) => setNovoCliente({ ...novoCliente, nome: e.target.value })}
+        />
+        <input
+          type="text"
+          placeholder="CPF"
+          value={novoCliente.cpf}
+          onChange={(e) => setNovoCliente({ ...novoCliente, cpf: e.target.value })}
+        />
+        <input
+          type="text"
+          placeholder="Telefone"
+          value={novoCliente.telefone}
+          onChange={(e) => setNovoCliente({ ...novoCliente, telefone: e.target.value })}
+        />
+        <input
+          type="text"
+          placeholder="Email"
+          value={novoCliente.email}
+          onChange={(e) => setNovoCliente({ ...novoCliente, email: e.target.value })}
+        />
+        <button type="button" onClick={handleAddCliente}>Salvar</button>
+      </form>
 
-        try {
-            const response = await fetch("/api/cliente", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(cliente),
-            });
-
-            if (response.ok) {
-                setMessage("Cliente adicionado com sucesso!");
-                setNome("");
-                setCpf("");
-                setTelefone("");
-                setEmail("");
-            } else {
-                const data = await response.json();
-                setMessage(`Erro: ${data.message}`);
-            }
-        } catch (error) {
-            setMessage("Erro ao adicionar cliente.");
-        }
-    };
-
-    return (
-        <div>
-            <h3>Adicionar Cliente</h3>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Nome:</label>
-                    <input
-                        type="text"
-                        value={nome}
-                        onChange={(e) => setNome(e.target.value)}
-                        required
-                    />
-                </div>
-                <div>
-                    <label>CPF:</label>
-                    <input
-                        type="text"
-                        value={cpf}
-                        onChange={(e) => setCpf(e.target.value)}
-                        required
-                    />
-                </div>
-                <div>
-                    <label>Telefone:</label>
-                    <input
-                        type="text"
-                        value={telefone}
-                        onChange={(e) => setTelefone(e.target.value)}
-                    />
-                </div>
-                <div>
-                    <label>Email:</label>
-                    <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                </div>
-                <button type="submit">Adicionar Cliente</button>
-            </form>
-            {message && <p>{message}</p>}
-        </div>
-    );
-}
+      <h3>Lista de Clientes</h3>
+      <ul>
+        {clientes.map(cliente => (
+          <li key={cliente.id}>{cliente.nome} - {cliente.cpf}</li>
+        ))}
+      </ul>
+    </div>
+  );
+};
 
 export default ClienteForm;
-//works

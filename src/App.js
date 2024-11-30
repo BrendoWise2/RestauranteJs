@@ -1,24 +1,13 @@
 import logo from './logo.svg';
 import './App.css';
 import RestauranteList from './RestauranteList';
-<<<<<<< Updated upstream
-import ClienteList from './ClienteList';
-import MesasList from './MesasList';
-=======
-import ClienteForm from './ClienteForm';
-import ClienteView from './ClienteView';
->>>>>>> Stashed changes
-
+import ClienteView from './ClienteView'; // Keep the relevant import
 
 function App() {
   return (
     <div className="App">
       <RestauranteList />
-<<<<<<< Updated upstream
-      
-=======
-      <ClienteView/>
->>>>>>> Stashed changes
+      <ClienteView /> {/* Add ClienteView or any other component you need */}
     </div>
   );
 }
