@@ -7,7 +7,7 @@ function App() {
   return (
     <div className="App">
       <RestauranteList />
-      <ClienteView /> {/* Add ClienteView or any other component you need */}
+      <ClienteView/>
     </div>
   );
 }
