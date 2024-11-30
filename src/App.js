@@ -1,17 +1,17 @@
 import logo from './logo.svg';
 import './App.css';
 import RestauranteList from './RestauranteList';
-import ClienteView from './ClienteView'; // Keep the relevant import
+import ClienteView from './ClienteView'; 
+import MesasView from './MesasView';
+import Notificaçao from './Notificaçao';
 
 function App() {
   return (
     <div className="App">
       <RestauranteList />
-<<<<<<< Updated upstream
-      
-=======
-      <ClienteView/>
->>>>>>> Stashed changes
+      <ClienteView />
+      <MesasView />
+      <Notificaçao />
     </div>
   );
 }
