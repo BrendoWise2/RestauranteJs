@@ -16,6 +16,7 @@ function RestauranteList() {
     const [activeComponent, setActiveComponent] = useState("list");
     const [selectedRestaurante, setSelectedRestaurante] = useState(null);
 
+    // Função para listar os restaurantes
     const listarRestaurantes = async () => {
         try {
             const response = await fetch("http://localhost:8080/restaurante");
@@ -23,16 +24,16 @@ function RestauranteList() {
                 throw new Error("Erro ao carregar restaurantes");
             }
             const data = await response.json();
-            setRestaurantes(data);
+            setRestaurantes(data);  // Atualiza a lista de restaurantes
         } catch (err) {
-            setError(err.message);
+            setError(err.message);  // Define o erro caso ocorra
         } finally {
-            setLoading(false);
+            setLoading(false);  // Finaliza o carregamento
         }
     };
 
     useEffect(() => {
-        listarRestaurantes();
+        listarRestaurantes();  // Carrega a lista ao inicializar o componente
     }, []);
 
     const handleViewRestaurante = (restaurante) => {
@@ -62,21 +63,29 @@ function RestauranteList() {
                 {error && <p>Erro: {error}</p>}
 
                 {activeComponent === "list" && (
-                    <DataTable value={restaurantes} paginator rows={5}>
-                        <Column field="nomeRestaurante" header="Nome" />
-                        <Column field="cnpj" header="CNPJ" />
-                        <Column field="endereco" header="Endereço" />
-                        <Column
-                            header="Ações"
-                            body={(rowData) => <Button label="Ver Detalhes" icon="pi pi-eye" onClick={() => handleViewRestaurante(rowData)} />}
-                        />
-                    </DataTable>
+                    <>
+                        {restaurantes.length > 0 ? (
+                            <DataTable value={restaurantes} paginator rows={5}>
+                                <Column field="nomeRestaurante" header="Nome" />
+                                <Column field="cnpj" header="CNPJ" />
+                                <Column field="endereco" header="Endereço" />
+                                <Column
+                                    header="Ações"
+                                    body={(rowData) => (
+                                        <Button label="Ver Detalhes" icon="pi pi-eye" onClick={() => handleViewRestaurante(rowData)} />
+                                    )}
+                                />
+                            </DataTable>
+                        ) : (
+                            <p>Nenhum restaurante disponível</p>
+                        )}
+                    </>
                 )}
 
                 {activeComponent === "form" && <RestauranteForm atualizarLista={listarRestaurantes} />}
                 {activeComponent === "view" && <RestauranteView restaurante={selectedRestaurante} />}
                 {activeComponent === "clienteForm" && (
-                    <ClienteForm restauranteId={selectedRestaurante.id} atualizarLista={listarRestaurantes} />
+                    <ClienteForm restaurantes={restaurantes} atualizarLista={listarRestaurantes} />
                 )}
                 {activeComponent === "clienteList" && (
                     <ClienteList restauranteId={selectedRestaurante.id} />

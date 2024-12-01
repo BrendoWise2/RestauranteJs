@@ -27,7 +27,6 @@ function App() {
     <div className="App">
       {/* Passando a lista de clientes como props para os componentes filhos */}
       <RestauranteList />
-      <ClienteView clientes={clientes} />
       <MesasView />
       <Notificacao />
     </div>

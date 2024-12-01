@@ -29,7 +29,7 @@ const ClienteList = () => {
         <ul>
           {clientes.map(cliente => (
             <li key={cliente.id}>
-              {cliente.nome} - {cliente.email} - {cliente.telefone}
+              {cliente.nome} - {cliente.cpf} - {cliente.telefone} - {cliente.email}
             </li>
           ))}
         </ul>
