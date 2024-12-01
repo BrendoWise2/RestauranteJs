@@ -5,7 +5,7 @@ import 'primeicons/primeicons.css';
 import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 
-const Notificaçao = () => {
+const Notificacao = () => {
     const toast = useRef(null); 
 
     const showConfirmation = () => {
@@ -47,4 +47,4 @@ const Notificaçao = () => {
     );
 };
 
-export default Notificaçao;
+export default Notificacao;

@@ -2,9 +2,8 @@ import React, { useState } from "react";
 import ClienteList from "./ClienteList";
 import MesasList from "./MesasList";
 
-function RestauranteView({ restaurante }) {
+function RestauranteView({ restaurante, atualizarRestaurante }) {
     const [view, setView] = useState("default"); // Gerenciar abas: default, mesas, clientes
-    const [clientes, setClientes] = useState([]); // Estado para armazenar os clientes cadastrados
     const [novoCliente, setNovoCliente] = useState({ nome: "", telefone: "", email: "", cpf: "" }); // Estado para o novo cliente
 
     if (!restaurante) {
@@ -12,16 +11,38 @@ function RestauranteView({ restaurante }) {
     }
 
     // Função para adicionar um novo cliente
-    const handleAddCliente = () => {
-        // Verificar se os campos estão preenchidos
+    const handleAddCliente = async () => {
         if (novoCliente.nome && novoCliente.telefone && novoCliente.email && novoCliente.cpf) {
-            // Associar o cliente ao restaurante
             const clienteComRestaurante = {
                 ...novoCliente,
-                restaurante: restaurante // Aqui associamos o restaurante
+                restauranteId: restaurante.id // Associar ao ID do restaurante
             };
-            setClientes([...clientes, clienteComRestaurante]); // Adiciona o novo cliente na lista
-            setNovoCliente({ nome: "", telefone: "", email: "", cpf: "" }); // Limpa o formulário
+
+            try {
+                // Enviar para o backend (ajuste a URL conforme sua API)
+                const response = await fetch("http://localhost:8080/cliente", {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(clienteComRestaurante),
+                });
+
+                if (response.ok) {
+                    // Atualizar a lista de clientes após o cadastro
+                    const novosClientes = [...(restaurante.clientes || []), clienteComRestaurante];
+                    atualizarRestaurante({
+                        ...restaurante,
+                        clientes: novosClientes,
+                    });
+                    setNovoCliente({ nome: "", telefone: "", email: "", cpf: "" }); // Limpa o formulário
+                } else {
+                    const erro = await response.json();
+                    alert("Erro ao cadastrar cliente: " + erro.message);
+                }
+            } catch (error) {
+                console.error("Erro ao cadastrar cliente", error);
+            }
         } else {
             alert("Por favor, preencha todos os campos!");
         }
@@ -86,7 +107,7 @@ function RestauranteView({ restaurante }) {
 
                     {/* Exibir lista de clientes cadastrados */}
                     <h3>Lista de Clientes</h3>
-                    <ClienteList clientes={clientes} />
+                    <ClienteList clientes={restaurante.clientes || []} />
                 </div>
             )}
 
