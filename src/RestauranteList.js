@@ -1,17 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { Panel } from "primereact/panel";
+import React, { useState, useEffect } from "react";
+import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { ProgressSpinner } from "primereact/progressspinner";
-import { Button } from "primereact/button";
+import { Panel } from 'primereact/panel';
 import RestauranteForm from "./RestauranteForm";
 import RestauranteView from "./RestauranteView";
+import ClienteForm from "./ClienteForm";
+import ClienteList from "./ClienteList";
 
 function RestauranteList() {
     const [restaurantes, setRestaurantes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [activeComponent, setActiveComponent] = useState("list"); // "list", "form", "view"
+    const [activeComponent, setActiveComponent] = useState("list");
     const [selectedRestaurante, setSelectedRestaurante] = useState(null);
 
     const listarRestaurantes = async () => {
@@ -34,8 +36,8 @@ function RestauranteList() {
     }, []);
 
     const handleViewRestaurante = (restaurante) => {
-        setSelectedRestaurante(restaurante); // Define o restaurante selecionado
-        setActiveComponent("view"); // Altera para a tela de visualização
+        setSelectedRestaurante(restaurante);
+        setActiveComponent("view");
     };
 
     return (
@@ -43,22 +45,16 @@ function RestauranteList() {
             <Panel header="Restaurantes">
                 <div style={{ marginBottom: "20px", display: "flex", gap: "10px" }}>
                     {activeComponent === "list" && (
-                        <Button
-                            label="Cadastrar Novo Restaurante"
-                            icon="pi pi-plus"
-                            onClick={() => setActiveComponent("form")}
-                        />
+                        <Button label="Cadastrar Novo Restaurante" icon="pi pi-plus" onClick={() => setActiveComponent("form")} />
                     )}
-
                     {activeComponent !== "list" && (
-                        <Button
-                            label="Voltar à Lista"
-                            icon="pi pi-arrow-left"
-                            onClick={() => {
-                                setActiveComponent("list");
-                                setSelectedRestaurante(null); // Limpa o restaurante selecionado
-                            }}
-                        />
+                        <Button label="Voltar à Lista" icon="pi pi-arrow-left" onClick={() => setActiveComponent("list")} />
+                    )}
+                    {selectedRestaurante && activeComponent === "view" && (
+                        <>
+                            <Button label="Cadastrar Cliente" icon="pi pi-plus" onClick={() => setActiveComponent("clienteForm")} />
+                            <Button label="Ver Clientes" icon="pi pi-users" onClick={() => setActiveComponent("clienteList")} />
+                        </>
                     )}
                 </div>
 
@@ -66,31 +62,28 @@ function RestauranteList() {
                 {error && <p>Erro: {error}</p>}
 
                 {activeComponent === "list" && (
-                    <DataTable value={restaurantes} paginator rows={5} tableStyle={{ minWidth: "50rem" }}>
-                        <Column field="nomeRestaurante" header="Nome do Restaurante" style={{ width: "25%" }} />
-                        <Column field="cnpj" header="CNPJ" style={{ width: "25%" }} />
-                        <Column field="endereco" header="Endereço" style={{ width: "25%" }} />
+                    <DataTable value={restaurantes} paginator rows={5}>
+                        <Column field="nomeRestaurante" header="Nome" />
+                        <Column field="cnpj" header="CNPJ" />
+                        <Column field="endereco" header="Endereço" />
                         <Column
                             header="Ações"
-                            body={(rowData) => (
-                                <Button
-                                    label="Ver Detalhes"
-                                    icon="pi pi-eye"
-                                    onClick={() => handleViewRestaurante(rowData)} // Define o restaurante selecionado
-                                />
-                            )}
-                            style={{ width: "15%" }}
+                            body={(rowData) => <Button label="Ver Detalhes" icon="pi pi-eye" onClick={() => handleViewRestaurante(rowData)} />}
                         />
                     </DataTable>
                 )}
 
-                {activeComponent === "form" && <RestauranteForm />}
+                {activeComponent === "form" && <RestauranteForm atualizarLista={listarRestaurantes} />}
                 {activeComponent === "view" && <RestauranteView restaurante={selectedRestaurante} />}
+                {activeComponent === "clienteForm" && (
+                    <ClienteForm restauranteId={selectedRestaurante.id} atualizarLista={listarRestaurantes} />
+                )}
+                {activeComponent === "clienteList" && (
+                    <ClienteList restauranteId={selectedRestaurante.id} />
+                )}
             </Panel>
         </div>
     );
 }
-
-//Works!!!
 
 export default RestauranteList;
