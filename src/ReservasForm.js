@@ -51,6 +51,29 @@ function ReservasForm({ atualizarLista }) {
 
     };
 
+    const confirmarReserva = async () => {
+        const reservaParaConfirmar = { numReserva, cliente, mesa };
+        try {
+            const response = await fetch('http://localhost:8080/reserva/confirmar', {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(reservaParaConfirmar)
+            });
+    
+            if (response.ok) {
+                setMensagem('Reserva Confirmada!');
+                // Aqui você pode querer atualizar a lista de reservas ou limpar os campos
+            } else {
+                const problema = await response.json();
+                if (problema.titulo) {
+                    setMensagem(problema.titulo);
+                }
+            }
+        } catch (error) {
+            setMensagem(error);
+        }
+    };
+    
     return (
         <>
             <form onSubmit={salvarReserva} className="p-fluid"
@@ -77,6 +100,9 @@ function ReservasForm({ atualizarLista }) {
                         required className="p-inputtext-lg" />
                     {fieldErrors.numMesa && <Message severity="error" text={fieldErrors.numMesa}
                     />}
+                    <button type="button" onClick={confirmarReserva} className="p-button p-component">
+                    Confirmar Reserva
+                    </button>
                 </div>
             </form>
         </>
