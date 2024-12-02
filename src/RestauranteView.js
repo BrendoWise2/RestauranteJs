@@ -4,7 +4,7 @@ import MesasList from "./MesasList";
 
 function RestauranteView({ restaurante, atualizarRestaurante }) {
     const [view, setView] = useState("default"); // Gerenciar abas: default, mesas, clientes
-    const [novoCliente, setNovoCliente] = useState({ nome: "", telefone: "", email: "", cpf: "" }); // Estado para o novo cliente
+    const [novoCliente, setNovoCliente] = useState({ nome: "", telefone: "", email: "", cpf: "", restauranteCliente:"" }); // Estado para o novo cliente
 
     if (!restaurante) {
         return <p>Nenhum restaurante selecionado.</p>;
@@ -12,7 +12,7 @@ function RestauranteView({ restaurante, atualizarRestaurante }) {
 
     // Função para adicionar um novo cliente
     const handleAddCliente = async () => {
-        if (novoCliente.nome && novoCliente.telefone && novoCliente.email && novoCliente.cpf) {
+        if (novoCliente.nome && novoCliente.telefone && novoCliente.email && novoCliente.cpf && novoCliente.restauranteCliente) {
             const clienteComRestaurante = {
                 ...novoCliente,
                 restauranteId: restaurante.id // Associar ao ID do restaurante
@@ -35,7 +35,7 @@ function RestauranteView({ restaurante, atualizarRestaurante }) {
                         ...restaurante,
                         clientes: novosClientes,
                     });
-                    setNovoCliente({ nome: "", telefone: "", email: "", cpf: "" }); // Limpa o formulário
+                    setNovoCliente({ nome: "", telefone: "", email: "", cpf: "", restauranteCliente:""}); // Limpa o formulário
                 } else {
                     const erro = await response.json();
                     alert("Erro ao cadastrar cliente: " + erro.message);
@@ -103,6 +103,15 @@ function RestauranteView({ restaurante, atualizarRestaurante }) {
                         value={novoCliente.email}
                         onChange={handleInputChange}
                     />
+
+                    <input
+                        type="text"
+                        name="restauranteCliente"
+                        placeholder="Restaurante"
+                        value={novoCliente.restauranteCliente}
+                        onChange={handleInputChange}
+                    />
+
                     <button onClick={handleAddCliente}>Cadastrar Cliente</button>
 
                     {/* Exibir lista de clientes cadastrados */}

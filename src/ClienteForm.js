@@ -7,7 +7,10 @@ function ClienteForm({ restaurantes, atualizarLista }) {
     const [cliente, setCliente] = useState({
         nome: "",
         email: "",
-        restauranteId: "",  // Adiciona o campo para o restaurante
+        restauranteId: "",
+        cpf:"",
+        telefone:"",
+        restaurante:""  // Adiciona o campo para o restaurante
     });
 
     const handleChange = (e) => {
@@ -66,6 +69,11 @@ function ClienteForm({ restaurantes, atualizarLista }) {
             <div className="p-field">
                 <label htmlFor="email">Email</label>
                 <InputText id="email" name="email" value={cliente.email} onChange={handleChange} />
+            </div>
+
+            <div className="p-field">
+                <label htmlFor="restaurenteCliente">Restaurante do Cliente</label>
+                <InputText id="restauranteCliente" name="restauranteCliente" value={cliente.restauranteCliente} onChange={handleChange} />
             </div>
 
             <div className="p-field">
