@@ -1,97 +1,148 @@
-import React, { useState } from "react";
-import { Dropdown } from "primereact/dropdown";
-import { InputText } from "primereact/inputtext";
-import { Button } from "primereact/button";
+import React, { useState } from 'react'; // Importando React e useState hook
 
-function ClienteForm({ restaurantes, atualizarLista }) {
-    const [cliente, setCliente] = useState({
-        nome: "",
-        email: "",
-        restauranteId: "",
-        cpf:"",
-        telefone:"",
-        restaurante:""  // Adiciona o campo para o restaurante
-    });
+function ClienteForm({ atualizarLista }) {
+  const [cliente, setCliente] = useState({
+    nome: '',
+    cpf: '',
+    telefone: '',
+    email: '',
+    restauranteCliente: ''
+  });
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setCliente((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
-    };
+  // Handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    const handleRestauranteChange = (e) => {
-        setCliente((prev) => ({
-            ...prev,
-            restauranteId: e.value.id,  // Armazena o id do restaurante selecionado
-        }));
-    };
+    try {
+      const response = await fetch('http://localhost:8080/cliente', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(cliente),
+      });
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const response = await fetch("http://localhost:8080/cliente", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(cliente),
-            });
+      if (response.ok) {
+        atualizarLista(); // Atualiza a lista de clientes no componente pai
+        setCliente({ nome: '', cpf: '', telefone: '', email: '', restauranteCliente: '' }); // Limpa os campos
+      } else {
+        console.error('Erro ao cadastrar o cliente');
+      }
+    } catch (error) {
+      console.error('Erro ao enviar dados', error);
+    }
+  };
 
-            if (!response.ok) {
-                throw new Error("Erro ao cadastrar cliente");
-            }
-
-            atualizarLista();  // Atualiza a lista de clientes após cadastro
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
-    return (
-        <form onSubmit={handleSubmit}>
-            <div className="p-field">
-                <label htmlFor="nome">Nome</label>
-                <InputText id="nome" name="nome" value={cliente.nome} onChange={handleChange} />
-            </div>
-
-            <div className="p-field">
-                <label htmlFor="cpf">CPF</label>
-                <InputText id="cpf" name="cpf" value={cliente.cpf} onChange={handleChange} />
-            </div>
-
-            <div className="p-field">
-                <label htmlFor="telefone">Telefone</label>
-                <InputText id="telefone" name="telefone" value={cliente.telefone} onChange={handleChange} />
-            </div>
-
-            <div className="p-field">
-                <label htmlFor="email">Email</label>
-                <InputText id="email" name="email" value={cliente.email} onChange={handleChange} />
-            </div>
-
-            <div className="p-field">
-                <label htmlFor="restaurenteCliente">Restaurante do Cliente</label>
-                <InputText id="restauranteCliente" name="restauranteCliente" value={cliente.restauranteCliente} onChange={handleChange} />
-            </div>
-
-            <div className="p-field">
-                <label htmlFor="restaurante">Restaurante</label>
-                <Dropdown
-                    id="restaurante"
-                    value={cliente.restauranteId}
-                    options={restaurantes}
-                    onChange={handleRestauranteChange}
-                    optionLabel="nomeRestaurante"
-                    optionValue="id"
-                    placeholder="Selecione o Restaurante"
-                />
-            </div>
-
-            <Button label="Cadastrar" type="submit" />
-        </form>
-    );
+  return (
+    <div style={styles.container}>
+      <h2 style={styles.title}>Cadastrar Cliente</h2>
+      <form onSubmit={handleSubmit} style={styles.form}>
+        <div style={styles.formGroup}>
+          <label htmlFor="nome" style={styles.label}>Nome:</label>
+          <input
+            type="text"
+            id="nome"
+            value={cliente.nome}
+            onChange={(e) => setCliente({ ...cliente, nome: e.target.value })}
+            style={styles.input}
+          />
+        </div>
+        <div style={styles.formGroup}>
+          <label htmlFor="cpf" style={styles.label}>CPF:</label>
+          <input
+            type="text"
+            id="cpf"
+            value={cliente.cpf}
+            onChange={(e) => setCliente({ ...cliente, cpf: e.target.value })}
+            style={styles.input}
+          />
+        </div>
+        <div style={styles.formGroup}>
+          <label htmlFor="telefone" style={styles.label}>Telefone:</label>
+          <input
+            type="text"
+            id="telefone"
+            value={cliente.telefone}
+            onChange={(e) => setCliente({ ...cliente, telefone: e.target.value })}
+            style={styles.input}
+          />
+        </div>
+        <div style={styles.formGroup}>
+          <label htmlFor="email" style={styles.label}>Email:</label>
+          <input
+            type="email"
+            id="email"
+            value={cliente.email}
+            onChange={(e) => setCliente({ ...cliente, email: e.target.value })}
+            style={styles.input}
+          />
+        </div>
+        <div style={styles.formGroup}>
+          <label htmlFor="restauranteCliente" style={styles.label}>Restaurante:</label>
+          <input
+            type="text"
+            id="restauranteCliente"
+            value={cliente.restauranteCliente}
+            onChange={(e) => setCliente({ ...cliente, restauranteCliente: e.target.value })}
+            style={styles.input}
+          />
+        </div>
+        <button type="submit" style={styles.button}>Cadastrar</button>
+      </form>
+    </div>
+  );
 }
 
 export default ClienteForm;
+
+const styles = {
+  container: {
+    maxWidth: '500px',
+    margin: '20px auto',
+    padding: '20px',
+    border: '1px solid #ccc',
+    borderRadius: '8px',
+    backgroundColor: '#f9f9f9',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+  },
+  title: {
+    textAlign: 'center',
+    color: '#333',
+    marginBottom: '20px',
+  },
+  form: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  formGroup: {
+    marginBottom: '15px',
+  },
+  label: {
+    display: 'block',
+    marginBottom: '5px',
+    fontWeight: 'bold',
+    color: '#555',
+  },
+  input: {
+    width: '100%',
+    padding: '10px',
+    fontSize: '16px',
+    border: '1px solid #ccc',
+    borderRadius: '4px',
+    outline: 'none',
+  },
+  button: {
+    marginTop: '10px',
+    padding: '10px 15px',
+    fontSize: '16px',
+    color: '#fff',
+    backgroundColor: '#4CAF50',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    transition: 'background-color 0.3s ease',
+  },
+  buttonHover: {
+    backgroundColor: '#45a049',
+  },
+};
